@@ -47,6 +47,7 @@ namespace EncryptionApp
             isCancelled = false;
             prBar.Value = 0;
 
+
             InitialStr = File.ReadAllText(openFileDialog.FileName);
 
         }
@@ -58,6 +59,12 @@ namespace EncryptionApp
 
         private async void startBtn_Click(object sender, RoutedEventArgs e)
         {
+            //If inserted file path doesn't exist aborts the proccess
+            if (!File.Exists(filePath.Text))
+            {
+                resBox.Text = "Given directory is false";
+                return;
+            }
             //Validation for empty imputs
             if (InitialStr.Length != 0 && InitialKey.Length != 0)
             {
@@ -91,7 +98,6 @@ namespace EncryptionApp
                 }
                 else
                 {
-
                     resBox.Text = ByteToString(encodedBytes, keyBytes);
                     isEncrypted = false;
                 }
@@ -115,9 +121,27 @@ namespace EncryptionApp
 
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
-            isCancelled = true;
-            prBar.Value = 0;
-            startBtn.IsEnabled = true;
+            if(!(prBar.Value == 0 || prBar.Value == 1000))
+            {
+                isCancelled = true;
+                prBar.Value = 0;
+                startBtn.IsEnabled = true;
+            }
+        }
+
+        private void filePath_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists(filePath.Text))
+            {
+                resBox.Text = "";
+                isCancelled = false;
+                InitialStr = File.ReadAllText(filePath.Text);
+            }
+            else
+            {
+                cancelBtn_Click(sender, e);
+                resBox.Text = "Given directory does not exists";
+            }
         }
     }
 }
